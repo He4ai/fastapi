@@ -14,14 +14,14 @@ class Base(DeclarativeBase, AsyncAttrs):
     def id_dict(self):
         return {'id': self.id}
 
-class Announcement(Base):
-    __tablename__ = 'announcement'
+class Advertisement(Base):
+    __tablename__ = 'advertisement'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String, nullable=False)
     content: Mapped[str] = mapped_column(String, nullable=False)
     price: Mapped[float] = mapped_column(Float, nullable=False)
     creation_date: Mapped[datetime.datetime] = mapped_column(DateTime, server_default=func.now())
-    autor: Mapped[str] = mapped_column(String, nullable=False)
+    author: Mapped[str] = mapped_column(String, nullable=False)
 
     @property
     def dict(self):
@@ -31,11 +31,11 @@ class Announcement(Base):
             'content': self.content,
             'price': self.price,
             'creation_date': self.creation_date.isoformat(),
-            'autor': self.autor,
+            'author': self.author,
         }
 
-ORM_OBJ = Announcement
-ORM_CLS = type(Announcement)
+ORM_OBJ = Advertisement
+ORM_CLS = type(Advertisement)
 
 async def init_orm():
     async with engine.begin() as conn:

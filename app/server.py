@@ -2,10 +2,10 @@ from fastapi import FastAPI
 from sqlalchemy import select
 
 import datetime
-from schema import (CreateAnnouncementRequest, CreateAnnouncementResponse, DeleteAnnouncementResponse,
-                    GetAnnouncementResponse, SearchAnnouncementResponse, UpdateAnnouncementRequest,
-                    UpdateAnnouncementResponse)
-from lifespan import Lifespan
+from schema import (CreateAdvertisementRequest, CreateAdvertisementResponse, DeleteAdvertisementResponse,
+                    GetAdvertisementResponse, SearchAdvertisementResponse, UpdateAdvertisementRequest,
+                    UpdateAdvertisementResponse)
+from lifespan import lifespan
 from dependency import SessionDependency
 import CRUD
 import models
@@ -15,60 +15,60 @@ from models import Session
 app = FastAPI(
     title='Avito',
     description='otivA',
-    lifespan=Lifespan
+    lifespan=lifespan
 )
 
-@app.post('/announcements', response_model=CreateAnnouncementResponse)
-async def create_announcement(announcement: CreateAnnouncementRequest, session: SessionDependency):
-    announcement_dict = announcement.model_dump(exclude_unset=True, exclude={"creation_date"})
-    announcement_orm_obj = models.Announcement(**announcement_dict)
-    await CRUD.add_item(session, announcement_orm_obj)
-    return announcement_orm_obj.id_dict
+@app.post('/advertisement', response_model=CreateAdvertisementResponse)
+async def create_advertisement(advertisement: CreateAdvertisementRequest, session: SessionDependency):
+    advertisement_dict = advertisement.model_dump(exclude_unset=True, exclude={"creation_date"})
+    advertisement_orm_obj = models.Advertisement(**advertisement_dict)
+    await CRUD.add_item(session, advertisement_orm_obj)
+    return advertisement_orm_obj.id_dict
 
 
-@app.get('/announcements/{announcement_id}', response_model=GetAnnouncementResponse)
-async def get_announcements(announcement_id: int, session: SessionDependency):
-    announcement_orm_obj = await CRUD.get_item_by_id(session, models.Announcement, announcement_id)
-    return announcement_orm_obj.dict
+@app.get('/advertisement/{advertisement_id}', response_model=GetAdvertisementResponse)
+async def get_advertisements(advertisement_id: int, session: SessionDependency):
+    advertisement_orm_obj = await CRUD.get_item_by_id(session, models.Advertisement, advertisement_id)
+    return advertisement_orm_obj.dict
 
-@app.get('/announcements/', response_model=SearchAnnouncementResponse)
-async def search_announcements(session: SessionDependency,
+@app.get('/advertisement', response_model=SearchAdvertisementResponse)
+async def search_advertisements(session: SessionDependency,
                                title: str | None = None,
                                content: str | None = None,
                                price: float | None = None,
-                               autor: str | None = None):
+                               author: str | None = None):
     filters = []
     if title is not None:
-        filters.append(models.Announcement.title == title)
+        filters.append(models.Advertisement.title == title)
     if content is not None:
-        filters.append(models.Announcement.content == content)
+        filters.append(models.Advertisement.content == content)
     if price is not None:
-        filters.append(models.Announcement.price == price)
-    if autor is not None:
-        filters.append(models.Announcement.autor == autor)
+        filters.append(models.Advertisement.price == price)
+    if author is not None:
+        filters.append(models.Advertisement.author == author)
 
-    query = select(models.Announcement)
+    query = select(models.Advertisement)
     if filters:
         query = query.where(*filters)
     query = query.limit(10000)
 
-    announcements = await session.scalars(query)
-    return {'results': [announcement.dict for announcement in announcements]}
+    advertisements = await session.scalars(query)
+    return {'results': [advertisement.dict for advertisement in advertisements]}
 
-@app.patch('/announcements/{announcement_id}', response_model=UpdateAnnouncementResponse)
-async def update_announcements(announcement_id: int, announcement_data: UpdateAnnouncementRequest,
+@app.patch('/advertisement/{advertisement_id}', response_model=UpdateAdvertisementResponse)
+async def update_advertisements(advertisement_id: int, advertisement_data: UpdateAdvertisementRequest,
                                session: SessionDependency):
-    announcement_dict = announcement_data.model_dump(exclude_unset=True)
-    announcement_orm_obj = await CRUD.get_item_by_id(session, models.Announcement, announcement_id)
+    advertisement_dict = advertisement_data.model_dump(exclude_unset=True)
+    advertisement_orm_obj = await CRUD.get_item_by_id(session, models.Advertisement, advertisement_id)
 
-    for field, value in announcement_dict.items():
-        setattr(announcement_orm_obj, field, value)
-    await CRUD.add_item(session, announcement_orm_obj)
+    for field, value in advertisement_dict.items():
+        setattr(advertisement_orm_obj, field, value)
+    await CRUD.add_item(session, advertisement_orm_obj)
     return SUCCESS_RESPONSE
 
-@app.delete('/announcements/{announcement_id}', response_model=DeleteAnnouncementResponse)
-async def get_announcements(announcement_id: int, session: SessionDependency):
-    announcement_orm_obj = await CRUD.get_item_by_id(session, models.Announcement, announcement_id)
-    await CRUD.delete_item(session, announcement_orm_obj)
+@app.delete('/advertisement/{advertisement_id}', response_model=DeleteAdvertisementResponse)
+async def delete_advertisements(advertisement_id: int, session: SessionDependency):
+    advertisement_orm_obj = await CRUD.get_item_by_id(session, models.Advertisement, advertisement_id)
+    await CRUD.delete_item(session, advertisement_orm_obj)
     return SUCCESS_RESPONSE
 

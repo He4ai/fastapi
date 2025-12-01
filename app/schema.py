@@ -3,41 +3,41 @@ from pydantic import BaseModel
 import datetime
 from typing import Literal
 
-class IdAnnouncement(BaseModel):
+class IdAdvertisement(BaseModel):
     id: int
 
 class SuccessResponse(BaseModel):
     status: Literal['success']
 
-class CreateAnnouncementRequest(BaseModel):
+class CreateAdvertisementRequest(BaseModel):
     title: str
     content: str
     price: float
-    autor: str
+    author: str
     creation_date: datetime.datetime
 
-class CreateAnnouncementResponse(IdAnnouncement):
+class CreateAdvertisementResponse(IdAdvertisement):
     pass
 
-class UpdateAnnouncementRequest(BaseModel):
+class UpdateAdvertisementRequest(BaseModel):
     title: str | None = None
     content: str | None = None
     price: float | None = None
-    autor: str | None = None
+    author: str | None = None
 
-class UpdateAnnouncementResponse(SuccessResponse):
+class UpdateAdvertisementResponse(SuccessResponse):
     pass
 
-class GetAnnouncementResponse(BaseModel):
+class GetAdvertisementResponse(BaseModel):
     id: int
     title: str
     content: str
     price: float
-    autor: str
+    author: str
     creation_date: datetime.datetime
 
-class SearchAnnouncementResponse(BaseModel):
-    results: list[GetAnnouncementResponse]
+class SearchAdvertisementResponse(BaseModel):
+    results: list[GetAdvertisementResponse]
 
-class DeleteAnnouncementResponse(BaseModel):
+class DeleteAdvertisementResponse(BaseModel):
     pass
